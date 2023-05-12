@@ -1,122 +1,125 @@
+import tkinter as tk
+
+root = tk.Tk()
+root.title("Shopping Cart")
+root.geometry("400x300")
+
 # declare cart as a global variable
 cart = {}
 
 # add item to cart function
-def add_item():
-    print("----CART MENU----")
-    print("1: Cookie - $1.50")
-    print("2: Sandwich - $4.00")
-    print("3: Water - $1.00")
-    item = input("Item: ")
-    quantity = int(input("Quantity: "))
-    if item == "1":
-        item_name = "Cookie"
-        item_price = 1.50
-    elif item == "2":
-        item_name = "Sandwich"
-        item_price = 4.00
-    elif item == "3":
-        item_name = "Water"
-        item_price = 1.00
-    else:
-        print("Invalid input")
-        return
+def add_item(item_name, item_price):
     if item_name in cart:
-        cart[item_name]["quantity"] += quantity
+        cart[item_name]["quantity"] += 1
     else:
-        cart[item_name] = {"quantity": quantity, "price": item_price}
-    if quantity == 1:
-        print("Added 1", item_name)
-    else:
-        print("Added", quantity, item_name + "s")
+        cart[item_name] = {"quantity": 1, "price": item_price}
+    result_label.config(text=f"{item_name} selected")
+    back_to_menu()
 
 # view cart function
 def view_cart():
     if not cart:
-        print("Your cart is empty")
+        result_label.config(text="Your cart is empty")
         return
-    print("------------------")
+    result_label.config(text="Items in your cart:\n")
     for item in cart:
-        print(f"{item} ({cart[item]['quantity']}) - ${cart[item]['quantity']*cart[item]['price']:.2f}")
-    print("------------------")
-
-# remove item function
-def remove_item():
-    if not cart:
-        print("Your cart is empty.")
-        return
-
-    print("------------------")
-    for i, item in enumerate(cart.items()):
-        item_name = item[0]
-        item_quantity = item[1]['quantity']
-        item_price = item[1]['price']
-        if item_quantity == 1:
-            print(f"{i+1}. {item_name} ({item_quantity}) - ${item_quantity*item_price:.2f}")
-        else:
-            print(f"{i+1}. {item_name}s ({item_quantity}) - ${item_quantity*item_price:.2f}")
-    print("------------------")
-
-    while True:
-        try:
-            selection = int(input("Enter the number of the item to remove: "))
-            if selection < 1 or selection > len(cart):
-                raise ValueError
-            break
-        except ValueError:
-            print("Invalid selection. Please try again.")
-
-    item_name = list(cart.keys())[selection - 1]
-    removed_item = cart.pop(item_name)
-    item_quantity = removed_item['quantity']
-    if item_quantity == 1:
-        print(f"Removed {item_quantity} {item_name}")
-    else:
-        print(f"Removed {item_quantity} {item_name}s")
-    print("------------------")
-
-    for i, item in enumerate(cart.items()):
-        item_name = item[0]
-        item_quantity = item[1]['quantity']
-        item_price = item[1]['price']
-        if item_quantity == 1:
-            print(f"{item_name} ({item_quantity}) - ${item_quantity*item_price:.2f}")
-        else:
-            print(f"{item_name}s ({item_quantity}) - ${item_quantity*item_price:.2f}")
-    print("------------------")
-
-
+        item_quantity = cart[item]["quantity"]
+        item_price = cart[item]["price"]
+        result_label.config(text=result_label.cget("text") + f"{item} ({item_quantity}) - ${item_quantity * item_price:.2f}\n")
+    result_label.config(text=result_label.cget("text") + "------------------")
 
 # checkout function
 def checkout():
     if not cart:
-        print("Your cart is empty")
+        result_label.config(text="Your cart is empty")
         return
     total = 0
-    print("------------------")
     for item in cart:
-        item_total = cart[item]['quantity']*cart[item]['price']
-        print(f"{item} ({cart[item]['quantity']}) - ${item_total:.2f}")
+        item_quantity = cart[item]["quantity"]
+        item_price = cart[item]["price"]
+        item_total = item_quantity * item_price
         total += item_total
-    print("------------------")
-    print(f"Total: ${total:.2f}")
-    print("Thank you for shopping with us!")
-    quit()
+    result_label.config(text="------------------\n")
+    for item in cart:
+        item_quantity = cart[item]["quantity"]
+        result_label.config(text=result_label.cget("text") + f"{item} ({item_quantity}) - ${item_quantity * cart[item]['price']:.2f}\n")
+    result_label.config(text=result_label.cget("text") + "------------------\n")
+    result_label.config(text=result_label.cget("text") + f"Total: ${total:.2f}\n")
+    result_label.config(text=result_label.cget("text") + "Thank you for shopping with us!")
 
-while True:
-    print("----MAIN MENU----")
-    print("1: Add item to cart")
-    print("2: View cart")
-    print("3: Checkout")
-    print("4: Remove item")
-    selection = input("Selection: ")
-    if selection == "1":
-        add_item()
-    elif selection == "2":
+# Function to handle menu selections
+# Function to handle menu selections
+def menu_selection(selection):
+    if selection == "add_item":
+        menu_frame.pack_forget()
+        cart_frame.pack()
+    elif selection == "view_cart":
         view_cart()
-    elif selection == "3":
+    elif selection == "checkout":
         checkout()
-    elif selection == "4":
-        remove_item()
-    else:
-        print("Invalid selection. Please try again.")
+        cart_frame.pack_forget()
+        start_new_order_button.pack()
+        add_item_button.pack_forget()
+        view_cart_button.pack_forget()
+        checkout_button.pack_forget()
+
+# Cart frame
+cart_frame = tk.Frame(root)
+
+# Cart menu buttons
+cookie_button = tk.Button(cart_frame, text="Cookie - $1.50", command=lambda: add_item("Cookie", 1.50), font=("Arial", 12))
+cookie_button.pack(fill=tk.X, padx=10, pady=5)
+sandwich_button = tk.Button(cart_frame, text="Sandwich - $4.00", command=lambda: add_item("Sandwich", 4.00), font=("Arial", 12))
+sandwich_button.pack(fill=tk.X, padx=10, pady=5)
+water_button = tk.Button(cart_frame, text="Water - $1.00", command=lambda: add_item("Water", 1.00), font=("Arial", 12))
+water_button.pack(fill=tk.X, padx=10, pady=5)
+
+# Back to menu button
+def back_to_menu():
+    cart_frame.pack_forget()
+    menu_frame.pack()
+
+back_button = tk.Button(cart_frame, text="Back to menu", command=back_to_menu, font=("Arial", 12))
+back_button.pack(fill=tk.X, padx=10, pady=5)
+
+# Start New Order button
+def start_new_order():
+    cart.clear()
+    result_label.config(text="")
+    start_new_order_button.pack_forget()
+    menu_frame.pack()  # Add this line to repack the menu_frame
+
+    # Add the following lines to repack the menu buttons
+    add_item_button.pack()
+    view_cart_button.pack()
+    checkout_button.pack()
+
+start_new_order_button = tk.Button(root, text="Start New Order", command=start_new_order, font=("Arial", 12))
+
+
+# Main menu frame
+menu_frame = tk.Frame(root)
+
+# Menu buttons
+add_item_button = tk.Button(menu_frame, text="Add item to cart", command=lambda: menu_selection("add_item"), font=("Arial", 12))
+view_cart_button = tk.Button(menu_frame, text="View cart", command=lambda: menu_selection("view_cart"), font=("Arial", 12))
+checkout_button = tk.Button(menu_frame, text="Checkout", command=lambda: menu_selection("checkout"), font=("Arial", 12))
+
+# Result label
+result_label = tk.Label(root, text="", font=("Arial", 12))
+
+# Pack buttons in menu frame
+add_item_button.pack(fill=tk.X, padx=10, pady=5)
+view_cart_button.pack(fill=tk.X, padx=10, pady=5)
+checkout_button.pack(fill=tk.X, padx=10, pady=5)
+
+# Pack menu frame
+menu_frame.pack()
+
+# Pack result label
+result_label.pack()
+
+# Run the tkinter event loop
+root.mainloop()
+
+
