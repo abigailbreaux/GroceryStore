@@ -16,6 +16,13 @@ def add_item(item_name, item_price):
     result_label.config(text=f"{item_name} selected")
     back_to_menu()
 
+# remove item function
+def remove_item():
+    if not cart:
+      result_label.config(text="Your cart is empty")
+      return
+    result_label.config(text="Items in your cart:\n")
+      
 # view cart function
 def view_cart():
     if not cart:
@@ -104,6 +111,8 @@ menu_frame = tk.Frame(root)
 add_item_button = tk.Button(menu_frame, text="Add item to cart", command=lambda: menu_selection("add_item"), font=("Arial", 12))
 view_cart_button = tk.Button(menu_frame, text="View cart", command=lambda: menu_selection("view_cart"), font=("Arial", 12))
 checkout_button = tk.Button(menu_frame, text="Checkout", command=lambda: menu_selection("checkout"), font=("Arial", 12))
+remove_item_button = tk.Button(menu_frame, text='Remove item from cart', command=lambda: remove_item("remove_item"), font=("Arial", 12))
+
 
 # Result label
 result_label = tk.Label(root, text="", font=("Arial", 12))
@@ -111,6 +120,7 @@ result_label = tk.Label(root, text="", font=("Arial", 12))
 # Pack buttons in menu frame
 add_item_button.pack(fill=tk.X, padx=10, pady=5)
 view_cart_button.pack(fill=tk.X, padx=10, pady=5)
+remove_item_button.pack(fill=tk.X, padx=10, pady=5)
 checkout_button.pack(fill=tk.X, padx=10, pady=5)
 
 # Pack menu frame
@@ -121,5 +131,4 @@ result_label.pack()
 
 # Run the tkinter event loop
 root.mainloop()
-
 
